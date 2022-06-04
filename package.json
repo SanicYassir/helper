@@ -1,0 +1,18 @@
+{
+  "name": "helper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "docxtemplater": "^3.29.5",
+    "install": "^0.13.0",
+    "npm": "^8.12.1",
+    "pizzip": "^3.1.1",
+    "xlsx": "^0.18.5"
+  }
+}
