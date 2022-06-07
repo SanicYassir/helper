@@ -16,13 +16,14 @@ for(const sheetname of workbook.SheetNames){
     });
 }
 
-const sheet  = worksheets["Planning Surv S2.CPI"];
+const sheet  = worksheets["Planning Surv S2.CI"];
 
 
 /*Editable*/
-const Semestre = 'SEMESTRE 4';
+const Semestre = 'SEMESTRE 2 - CI';
 const Year = 'Année Universitaire 2021-2022';
-const controlType = 'CONTRÔLE TERMINAL'
+const controlType = 'CONTRÔLE TERMINAL';
+const session ='SESSION NORMALE - PRINTEMPS';
 
 
 
@@ -67,12 +68,15 @@ for(var i =0 ; i<sheet.length;i++){
     if(sheet[i]["Surveillants"] !== Surveillants && sheet[i]["Surveillants"]!==undefined){
         Surveillants = sheet[i]["Surveillants"];
     }
-
+    
+    let d = Dates.split('/');
+    let newd = `${d[1]}/${d[0]}/${d[2]}`
     table.push({
+        session,
         Semestre,
         Year,
         controlType,
-        Dates,
+        Dates:newd,
         Locaux,
         Heure:Heure.split('-')[0],
         Module,
@@ -80,18 +84,16 @@ for(var i =0 ; i<sheet.length;i++){
         Responsables,
         Surveillants
     })
+
 }
 
 
                                 /* Generate PVS */
-const dir = `./PVS/${Semestre}`;
+const dirPv = `./PVS/${Semestre}`;
 
-if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir);
+if (!fs.existsSync(dirPv)){
+    fs.mkdirSync(dirPv);
 }
-
-// Load the docx file as binary content
-
 
 // Creating docs 
 table.forEach(async (item,index)=>{
@@ -115,9 +117,42 @@ table.forEach(async (item,index)=>{
         type: "nodebuffer",
         compression: "DEFLATE",
     });
-    fs.writeFileSync(path.resolve(dir, `${index}.docx`), buf);
+    fs.writeFileSync(path.resolve(dirPv, `${index}.docx`), buf);
 })
 
 
 
+                        
+                
+                        /*Generate Chemises*/
+      const dirCh = `./CHEMISES/${Semestre}`;
 
+      if (!fs.existsSync(dirCh)){
+          fs.mkdirSync(dirCh);
+      }
+      
+// Creating docs 
+table.forEach(async (item,index)=>{
+
+    const content = fs.readFileSync(
+        path.resolve(__dirname, "Chemise template.docx"),
+        "binary"
+    );
+    
+    
+    const zip = new PizZip(content);
+    
+    const doc = new Docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+    });
+
+    doc.render(item);
+    
+    const buf = await doc.getZip().generate({
+        type: "nodebuffer",
+        compression: "DEFLATE",
+    });
+    fs.writeFileSync(path.resolve(dirCh, `${index}.docx`), buf);
+});
+            /*Eveloppes*/
