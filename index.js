@@ -16,14 +16,15 @@ for(const sheetname of workbook.SheetNames){
     });
 }
 
-const sheet  = worksheets["Planning Surv S2.CI"];
+const sheet  = worksheets["Planning Surv S4.CPI"];
 
 
 /*Editable*/
-const Semestre = 'SEMESTRE 2 - CI';
+const Semestre = 'SEMESTRE 4 - CPI';
 const Year = 'Année Universitaire 2021-2022';
 const controlType = 'CONTRÔLE TERMINAL';
 const session ='SESSION NORMALE - PRINTEMPS';
+
 
 
 
@@ -156,3 +157,34 @@ table.forEach(async (item,index)=>{
     fs.writeFileSync(path.resolve(dirCh, `${index}.docx`), buf);
 });
             /*Eveloppes*/
+
+const dirEnv = `./Eveloppes/${Semestre}`;
+
+if (!fs.existsSync(dirEnv)){
+    fs.mkdirSync(dirEnv);
+}
+            
+      // Creating docs 
+table.forEach(async (item,index)=>{
+
+    const content = fs.readFileSync(
+        path.resolve(__dirname, "Eveloppe template.docx"),
+        "binary"
+    );
+          
+          
+          const zip = new PizZip(content);
+          
+          const doc = new Docxtemplater(zip, {
+              paragraphLoop: true,
+              linebreaks: true,
+          });
+      
+          doc.render(item);
+          
+          const buf = await doc.getZip().generate({
+              type: "nodebuffer",
+              compression: "DEFLATE",
+          });
+          fs.writeFileSync(path.resolve(dirEnv, `${index}.docx`), buf);
+      });
