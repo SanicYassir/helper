@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "docx-merger": "^1.2.2",
     "docxtemplater": "^3.29.5",
     "install": "^0.13.0",
     "npm": "^8.12.1",

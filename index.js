@@ -3,6 +3,26 @@ const PizZip = require("pizzip");
 const Docxtemplater = require("docxtemplater");
 const fs = require("fs");
 const path = require("path");
+const DocxMerger = require('docx-merger');
+
+const merge =(fileName,dirMerge)=>{
+    
+    const files = [];
+    console.log(files.length);
+    fs.readdirSync(dirMerge).forEach(file => {
+
+        let f = fs.readFileSync(path.resolve(dirMerge, `${file}`), 'binary');
+        files.push(f);
+    });
+
+    var docx = new DocxMerger({},files);
+    // //SAVING THE DOCX FILE
+
+    docx.save('nodebuffer',function (data) {
+    fs.writeFile(`${fileName}.docx`, data, function(err){/*...*/});
+    console.log(files.length);
+    });
+}
 
 const workbook = XLSX.readFile('./srv.xlsx');
 
@@ -16,16 +36,13 @@ for(const sheetname of workbook.SheetNames){
     });
 }
 
-const sheet  = worksheets["Planning Surv S4.CPI"];
-
+const sheet  = worksheets["Planning Surv S2.CI"];
 
 /*Editable*/
-const Semestre = 'SEMESTRE 4 - CPI';
+const Semestre = 'SEMESTRE 2 - CI';
 const Year = 'Année Universitaire 2021-2022';
 const controlType = 'CONTRÔLE TERMINAL';
-const session ='SESSION NORMALE - PRINTEMPS';
-
-
+const session ='Session Printemps --Rattrapage-- ';
 
 
 
@@ -89,7 +106,9 @@ for(var i =0 ; i<sheet.length;i++){
 }
 
 
-                                /* Generate PVS */
+                               
+
+/* Generate PVS */
 const dirPv = `./PVS/${Semestre}`;
 
 if (!fs.existsSync(dirPv)){
@@ -121,11 +140,14 @@ table.forEach(async (item,index)=>{
     fs.writeFileSync(path.resolve(dirPv, `${index}.docx`), buf);
 })
 
+ 
 
 
                         
                 
-                        /*Generate Chemises*/
+                       
+
+/*Generate Chemises*/
       const dirCh = `./CHEMISES/${Semestre}`;
 
       if (!fs.existsSync(dirCh)){
@@ -156,7 +178,11 @@ table.forEach(async (item,index)=>{
     });
     fs.writeFileSync(path.resolve(dirCh, `${index}.docx`), buf);
 });
-            /*Eveloppes*/
+          
+
+
+
+/*Eveloppes*/
 
 const dirEnv = `./Eveloppes/${Semestre}`;
 
@@ -188,3 +214,10 @@ table.forEach(async (item,index)=>{
           });
           fs.writeFileSync(path.resolve(dirEnv, `${index}.docx`), buf);
       });
+    
+    setTimeout(()=>{
+        merge(`./Last/${Semestre} Env.docx`,dirEnv);
+        merge(`./Last/${Semestre} Ch.docx`,dirCh);
+        merge(`./Last/${Semestre} Pvs.docx`,dirPv);
+    },500);
+  
